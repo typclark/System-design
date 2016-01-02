@@ -1,0 +1,157 @@
+Design a database:
+Scenario:
+example: twitter.
+3 parts:
+login in/out: manage session
+register/update: 
+extra operations
+evaluate Neccesary:limitation
+login/register: most frequent
+users number: total users, DAILY ACTIVE USER(IMPORTANT)
+ask: total 100m, daily 1m.
+predict in 3 months: 
+  daily 1m*2
+  register percentage: 3-5% 20,000.
+  qps = 20,000/80,000 almost 1, too low
+  login percentage: 15%. why not all login, 
+  average login time:1.2 somtiems fail, wrong pwd or mulltiple logins.  
+  DAILY LOGIN TIME=2M*15%*1.2 = 360,000
+  AVERAGE LOGIN FREQUENCY=360,000/24hosur = 4.2/s
+  Normal login frequency = average*2 = 8.4/s
+  peak login frequency = normal*5 = 42/s;
+Application
+  single pc 10^6-10^9
+   receptionist-->Account Service(register,....)
+Kilo,data
+  class User(){
+    private int userid;//primary key
+    private String name;
+    private String password;
+  }
+QUESTION:why need userid,if username and userid are both unique.
+my:easy to manage for int number,standard way. not like string, some of them are long/short
+correct: 1.easy to search, hash, binary search. 2.save space, string is too long.
+
+QUESTION, if you can delete a feature in java, what do you want to delete? 
+correct: combine all data type(int, short, long)
+
+table
+userid || name || pwd
+QUESTION: operations on data, 
+my: i/d/u/s
+correct: siud,
+QUESTION: which operation can be deleted?
+my: insert, can be replace by update.
+correct: insert, can be replace by update.
+
+QUESTION: IMPLEMENT VERIFICATION AND BAN
+state life cycle. 
+register-->unverified-->active-->baned
+                          ^      |
+                          |------|
+QUESTION: why not delete acount, when user delete their accounts.
+my: other places like message system still has their information, like comment, reply.
+correct:same, so just set them as removed, not actually remove the data.
+
+class User{
+  int userId;
+  //improve
+  char[10] name;
+  Question: why fixed char instead of string.
+  ans: 1. align data, easy to search, save space.
+  char[10] hiddenpassword.
+  Question: why hidden password
+  ans:1.protect
+  Question: how to verify pwd?
+  ans:encry/sth way pws and pass this value to server to verify.
+  
+
+  int state;
+}
+
+q3:login out after a period of time.
+session manage
+login-online--timeout
+        |         |
+        offline ---
+Question:What is session
+correct: like a receipt or temorary communication line.
+q:different devices
+a:different session
+q:how to indicate session in data structure
+a: add a session list
+class Session{
+  int sessionID;
+  int userID;
+  int devicecode;
+  time time_out;
+  
+}
+
+q:shopping cart synchronous
+
+q4:find
+O(n) how to improve:
+index hash
+find [4,20] range
+binary search tree
+time of range query O(logN+k)
+find min and preorder traverse.
+B+ Tree!! better.
+
+q5:support payment, membership
+q:double money, cause problem, how to solve?
+a:not so accurate, double*100 to int
+time end_time;
+
+//previouse
+userid,
+time time_out;
+
+q:money cost, time isn't added. solve it.
+a: log system. add transaction with log.
+write log before do transaction.
+write log:
+transaction_1123:BEGIN
+money=20;endTime=16_07_2016;
+money -= 10;
+system goes down.
+system goes up.
+read log, find not finish, recover it.
+q:where do we put log:
+a:file.
+
+checker: 
+check unknown user
+check duplicated user
+
+buy member twice: double click
+lock
+
+database principle
+acid
+atomicity, consistency, isolation, durability
+
+design paypal
+s:
+  bank; 2.who; 3submit; 4.feedback
+n: 
+  daily user=10m;
+  use percentage:60%; x1.1 multiple submits
+  6.6m/day
+  almost 66/s average
+  peak 60*2*5 = 660
+  future 660*1.5 = 1k/s
+  
+  submit qps 1k/s
+  single pc 100/s
+  need 10 machines.
+  
+  load balance:
+  dispatcher
+  round robin/ random
+  better: 1.monitor find best pc to assign 2.request/pull 
+  what if dispatch is down: hot copy/ log
+  dispatch can handle qps 10k to 100k/s
+  
+  
